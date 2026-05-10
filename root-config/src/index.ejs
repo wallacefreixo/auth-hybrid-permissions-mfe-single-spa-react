@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Root Config</title>
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: localhost:*; script-src 'unsafe-inline' 'unsafe-eval' https: localhost:*; connect-src https: localhost:* ws://localhost:*; style-src 'unsafe-inline' https:; object-src 'none';">
+  <meta name="importmap-type" use-injector />
+
+  <script type="injector-importmap">
+    {
+      "imports": {
+        "single-spa": "https://cdn.jsdelivr.net/npm/single-spa@6.0.3/lib/es2015/esm/single-spa.min.js",
+        "single-spa-react": "https://esm.sh/single-spa-react@6.0.2",
+
+        "react": "https://esm.sh/react@19.2.6",
+        "react-dom": "https://esm.sh/react-dom@19.2.6",
+        "react-dom/client": "https://esm.sh/react-dom@19.2.6/client",
+        "react/jsx-runtime": "https://esm.sh/react@19.2.6/jsx-runtime",
+        "react/jsx-dev-runtime": "https://esm.sh/react@19.2.6/jsx-dev-runtime",
+
+        "react-router-dom": "https://esm.sh/react-router-dom@7.8.2",
+        "@tanstack/react-query": "https://esm.sh/@tanstack/react-query@5.96.1",
+        "i18next": "https://esm.sh/i18next@26.0.3",
+        "react-i18next": "https://esm.sh/react-i18next@17.0.2"
+      }
+    }
+  </script>
+  <link rel="preload" href="https://cdn.jsdelivr.net/npm/single-spa@6.0.3/lib/es2015/esm/single-spa.min.js" as="module">
+
+  <% if (isLocal) { %>
+  <script type="injector-importmap">
+    {
+      "imports": {
+        "@app/root-config": "http://localhost:9000/app-root-config.js",
+        "@app/shared-auth": "http://localhost:9001/app-shared-auth.js",
+        "@app/shared-ui": "http://localhost:9002/app-shared-ui.js",
+        "@app/mfe-auth": "http://localhost:9003/app-mfe-auth.js",
+        "@app/mfe-layout": "http://localhost:9004/app-mfe-layout.js",
+        "@app/mfe-dashboard": "http://localhost:9005/app-mfe-dashboard.js"
+      }
+    }
+  </script>
+  <% } %>
+
+  <script src="https://cdn.jsdelivr.net/npm/import-map-overrides@5.1.1/dist/import-map-overrides.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@single-spa/import-map-injector@2.0.1/lib/import-map-injector.js"></script>
+</head>
+<body>
+  <noscript>
+    You need to enable JavaScript to run this app.
+  </noscript>
+  <main></main>
+  <script>
+    window.importMapInjector.initPromise.then(() => {
+      import('@app/root-config');
+    });
+  </script>
+  <import-map-overrides-full show-when-local-storage="devtools" dev-libs></import-map-overrides-full>
+
+  </div>
+</body>
+</html>
