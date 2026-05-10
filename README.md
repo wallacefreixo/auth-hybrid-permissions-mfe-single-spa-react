@@ -1,0 +1,1 @@
+# auth-sso-mfe-single-spa-react
