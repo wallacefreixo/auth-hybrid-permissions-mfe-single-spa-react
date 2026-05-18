@@ -1,23 +1,8 @@
 # 🧩 Microfrontend Architecture - Hybrid Auth & Permissions
 
-Aplicação frontend baseada em **microfrontends com single-spa**, construída com React 19 e foco em:
+Aplicação frontend baseada em microfrontends com single-spa, construída com React 19 e foco em escalabilidade, performance, segurança, permissionamento e desacoplamento.
 
-- escalabilidade
-- desacoplamento
-- autenticação híbrida
-- PBAC baseado em permissões
-- segurança
-- compartilhamento de dependências
-- performance
-
-O projeto implementa:
-
-- login local
-- autenticação federada via Identity Provider (IdP)
-- controle de permissões frontend/backend
-- gerenciamento global de autenticação
-- cache distribuído
-- comunicação segura via cookies HTTP-only
+Este projeto implementa autenticação híbrida login local + autenticação federada via Identity Provider (IdP), controle de permissões, comunicação segura via cookies HTTP-only, gerenciamento global de autenticação, cache e compartilhamento eficiente de dependências entre múltiplos MFEs.
 
 ---
 
