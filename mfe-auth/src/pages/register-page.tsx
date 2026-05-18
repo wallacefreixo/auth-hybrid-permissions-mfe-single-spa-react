@@ -10,22 +10,21 @@ import {
   AlertError,
   Button,
   CircularLoading,
-  Link,
 } from '@app/shared-ui';
-import { useLoginMutation, loginWithSSO } from '@app/shared-auth';
-import { loginSchema, TLoginFormData } from '@/schemas/login-schema';
+import { useRegisterMutation } from '@app/shared-auth';
+import { registerSchema, TRegisterFormData } from '@/schemas/register-schema';
 
-export function LoginPage() {
+export function RegisterPage() {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const loginMutation = useLoginMutation();
+  const registerMutation = useRegisterMutation();
 
   const {
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm<TLoginFormData>({
-    resolver: zodResolver(loginSchema),
+  } = useForm<TRegisterFormData>({
+    resolver: zodResolver(registerSchema),
     defaultValues: {
       email: '',
       password: '',
@@ -33,25 +32,21 @@ export function LoginPage() {
     mode: 'onTouched',
   });
 
-  async function onSubmit(data: TLoginFormData) {
+  async function onSubmit(data: TRegisterFormData) {
     try {
-      await loginMutation.mutateAsync(data);
-      navigate('/dashboard');
+      await registerMutation.mutateAsync(data);
+      navigate('/login');
     } catch {
       return;
     }
   }
 
-  function handleLoginWithSSO() {
-    loginWithSSO();
-  }
-
   return (
     <PaperForm>
-      <TitleForm>{t('common.login')}</TitleForm>
+      <TitleForm>{t('common.register')}</TitleForm>
 
       <BoxForm onSubmit={handleSubmit(onSubmit)}>
-        {loginMutation.error ? <AlertError>{t('login.error')}</AlertError> : null}
+        {registerMutation.error ? <AlertError>{t('register.error')}</AlertError> : null}
 
         <Controller
           name="email"
@@ -77,17 +72,15 @@ export function LoginPage() {
               label={t('common.passwordLabel')}
               type="password"
               required
-              autoComplete="current-password"
+              autoComplete="new-password"
               error={!!errors.password}
               helperText={errors.password ? t('common.passwordHelper') : ''}
             />
           )}
         />
 
-        <Link onClick={handleLoginWithSSO}>{t('common.login')} SSO</Link>
-
-        <Button variant="contained" type="submit" disabled={loginMutation.isPending}>
-          {loginMutation.isPending ? <CircularLoading /> : t('common.login')}
+        <Button variant="contained" type="submit" disabled={registerMutation.isPending}>
+          {registerMutation.isPending ? <CircularLoading /> : t('common.register')}
         </Button>
       </BoxForm>
     </PaperForm>

@@ -1,9 +1,9 @@
 {
-  "name": "@app/mfe-auth",
+  "name": "@app/mfe-forbidden",
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "start": "webpack serve --port 9003",
+    "start": "webpack serve --port 9006",
     "start:standalone": "webpack serve --env standalone",
     "build": "concurrently npm:build:*",
     "build:webpack": "webpack --mode=production",
@@ -23,11 +23,7 @@
     "single-spa": "^5.9.3",
     "single-spa-react": "^6.0.2"
   },
-  "dependencies": {
-    "@hookform/resolvers": "^5.2.2",
-    "react-hook-form": "^7.72.0",
-    "zod": "^4.3.6"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@babel/core": "^7.23.3",
     "@babel/plugin-transform-runtime": "^7.23.3",

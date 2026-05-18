@@ -23,6 +23,9 @@ export function Navbar() {
         <NavItem component={Link} to="/login">
           {t('common.login')}
         </NavItem>
+        <NavItem component={Link} to="/register">
+          {t('common.register')}
+        </NavItem>
       </>
     );
   }

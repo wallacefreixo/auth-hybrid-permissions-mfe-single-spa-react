@@ -3,9 +3,14 @@ import { getSession } from './auth-services';
 
 export type TAuthStatus = 'loading' | 'authenticated' | 'unauthenticated';
 
+export type PermissionTree = {
+  [key: string]: true | PermissionTree;
+};
+
 type TUser = {
   id: string;
   email: string;
+  permissions: PermissionTree;
 };
 
 type TAuthState = {
@@ -22,7 +27,8 @@ let state: TAuthState = {
   status: 'loading',
   user: {
     id: '',
-    email: ',',
+    email: '',
+    permissions: {},
   },
   isBootstrapped: false,
 };
@@ -68,6 +74,7 @@ export function setUnauthenticated() {
     user: {
       id: '',
       email: '',
+      permissions: {},
     },
     isBootstrapped: true,
   });

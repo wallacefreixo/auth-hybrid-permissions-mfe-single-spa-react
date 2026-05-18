@@ -1,9 +1,14 @@
+import { navigateToUrl } from 'single-spa';
 import { apiClient } from '@/http';
 import { setCsrfToken } from './csrf-store';
-import { navigateToUrl } from 'single-spa';
 
 export type TCsrfResponse = {
   csrfToken: string;
+};
+
+export type TPayload = {
+  email: string;
+  password: string;
 };
 
 export async function getCsrfToken() {
@@ -13,7 +18,17 @@ export async function getCsrfToken() {
 }
 
 export function loginWithSSO() {
-  navigateToUrl('http://localhost:4000/auth/login');
+  navigateToUrl('http://localhost:4000/auth/sso/login');
+}
+
+export async function login(payload: TPayload) {
+  const response = await apiClient.post('/auth/login', payload);
+  return response.data;
+}
+
+export async function register(payload: TPayload) {
+  const response = await apiClient.post('/auth/register', payload);
+  return response.data;
 }
 
 export async function logout() {

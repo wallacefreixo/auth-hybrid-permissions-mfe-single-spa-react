@@ -19,6 +19,7 @@ export const ptBR = {
   dashboard: {
     description: 'Você acessou uma rota protegida com sucesso.',
     logout: 'Sair',
+    export: 'Exportar para',
   },
   theme: {
     toggle: 'Alternar tema',
@@ -27,5 +28,9 @@ export const ptBR = {
     ariaLabel: 'Alterar idioma',
     portuguese: 'Português',
     english: 'Inglês',
+  },
+  forbidden: {
+    title: 'Acesso negado',
+    description: 'Você não possui permissão para acessar este recurso.',
   },
 } as const;

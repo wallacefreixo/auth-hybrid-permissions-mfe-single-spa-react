@@ -4,7 +4,7 @@ const singleSpaDefaults = require('webpack-config-single-spa-react-ts');
 module.exports = (webpackConfigEnv, argv) => {
   const defaultConfig = singleSpaDefaults({
     orgName: 'app',
-    projectName: 'mfe-dashboard',
+    projectName: 'mfe-forbidden',
     webpackConfigEnv,
     argv,
   });
@@ -18,7 +18,6 @@ module.exports = (webpackConfigEnv, argv) => {
       'single-spa-react',
       'i18next',
       'react-i18next',
-      '@tanstack/react-query',
     ],
   });
 };

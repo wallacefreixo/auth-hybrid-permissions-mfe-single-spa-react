@@ -1,5 +1,5 @@
-import { apiClient } from './api-client';
 import { getCsrfTokenFromMemory } from '@/auth/csrf-store';
+import { apiClient } from './api-client';
 
 let isConfigured = false;
 

@@ -1,8 +1,23 @@
-# 🧩 Microfrontend Architecture - Auth & Dashboard
+# 🧩 Microfrontend Architecture - Hybrid Auth & Permissions
 
-Aplicação frontend baseada em **microfrontends com single-spa**, construída com React 19 e foco em **escalabilidade, performance, segurança e desacoplamento**.
+Aplicação frontend baseada em **microfrontends com single-spa**, construída com React 19 e foco em:
 
-Este projeto implementa autenticação segura, gerenciamento de estado distribuído e compartilhamento eficiente de dependências entre múltiplos MFEs.
+- escalabilidade
+- desacoplamento
+- autenticação híbrida
+- PBAC baseado em permissões
+- segurança
+- compartilhamento de dependências
+- performance
+
+O projeto implementa:
+
+- login local
+- autenticação federada via Identity Provider (IdP)
+- controle de permissões frontend/backend
+- gerenciamento global de autenticação
+- cache distribuído
+- comunicação segura via cookies HTTP-only
 
 ---
 
@@ -37,24 +52,26 @@ Este projeto implementa autenticação segura, gerenciamento de estado distribu�
 
 - Evitam duplicação de código
 - Centralizam:
-  - autenticação
+  - Autenticação
+  - Permissionamento
   - HTTP client
   - UI
-  - tema
+  - Tema
   - i18n
 
 ---
 
 ### 🔹 Separação de responsabilidades
 
-| Camada        | Responsabilidade                                     |
-| ------------- | ---------------------------------------------------- |
-| root-config   | orquestra MFEs e inicializa recursos de autenticação |
-| mfe-layout    | layout + navegação                                   |
-| mfe-auth      | login SSO                                            |
-| mfe-dashboard | área protegida                                       |
-| shared-auth   | autenticação + API                                   |
-| shared-ui     | UI + tema + i18n                                     |
+| Camada        | Responsabilidade                                                        |
+| ------------- | ----------------------------------------------------------------------- |
+| root-config   | orquestra MFEs e inicializa recursos de autenticação + permissionamento |
+| mfe-layout    | layout + navegação                                                      |
+| mfe-auth      | login híbrido local + SSO                                               |
+| mfe-dashboard | área protegida e permissionada                                          |
+| mfe-forbidden | renderização página restrita                                            |
+| shared-auth   | autenticação + permissionamento + API                                   |
+| shared-ui     | UI + tema + i18n                                                        |
 
 ---
 
@@ -66,9 +83,10 @@ Este projeto implementa autenticação segura, gerenciamento de estado distribu�
 
 ```bash
 root-config     → orquestração single-spa
-mfe-auth        → login SSO
-mfe-dashboard   → dashboard protegido
+mfe-auth        → login híbrido local + SSO
+mfe-dashboard   → dashboard protegido e permissionado
 mfe-layout      → layout e navegação
+mfe-forbidden   → renderização página restrita
 ```
 
 ---
@@ -77,26 +95,31 @@ mfe-layout      → layout e navegação
 
 ---
 
-#### 🔐 shared-auth
+### 🔐 shared-auth
 
-Responsável por autenticação, estado global e comunicação com backend
+Responsável por autenticação, permissionamento, estado global e comunicação com backend
 
 ```bash
 shared-auth/
   auth/
     auth-guard                 → protege rotas privadas
-    guest-guard                → protege login SSO para visitante
+    guest-guard                → protege login local + SSO para visitante
     auth-provider              → providers do módulo de autenticação
     auth-store                 → estado global de autenticação em memória
     auth-services              → chamadas de API de autenticação
     csrf-store                 → armazenamento do token CSRF em memória
     use-auth-store             → hook para consumir o auth-store no React
-    use-auth-mutations         → logout com React Query
+    use-auth-mutations         → login, register, logout com React Query
     use-bootstrap-auth         → resolve sessão inicial do usuário e inicializa interceptors
 
   http/
     api-client                 → instância base do cliente HTTP
     interceptors               → tratamento global de request/response
+
+  permissions/
+    auth-permissions           → utilitários de permissões
+    permissions-guard          → proteção por permissão
+    use-permission             → valida permissões do usuário autenticado
 
   query/
     query-client               → cliente global de cache e queries do React Query
@@ -104,7 +127,7 @@ shared-auth/
 
 ---
 
-#### 🔐 shared-ui
+### 🔐 shared-ui
 
 Responsável por UI global, tema e internacionalização.
 
@@ -130,11 +153,50 @@ shared-ui/
 
 ---
 
+## 🌐 Autenticação Híbrida
+
+O frontend suporta dois fluxos:
+
+---
+
+### 🔐 Login Local
+
+Fluxo tradicional:
+
+```text
+Frontend → Backend → PostgreSQL
+```
+
+Utilizando:
+
+- email
+- senha
+- JWT local
+- refresh token local
+
+---
+
+### 🔐 Login Federado (OIDC)
+
+Fluxo:
+
+```text
+Frontend → Backend → Keycloak
+```
+
+Utilizando:
+
+- Authorization Code Flow
+- PKCE
+- state validation
+
+---
+
 ## 🔐 Segurança
 
 ### 🔐 OIDC Authorization Code Flow + PKCE
 
-- O frontend utiliza autenticação baseada em **OpenID Connect (OIDC)** com:
+- No fluxo SSO o frontend utiliza autenticação baseada em **OpenID Connect (OIDC)** com:
   - **Authorization Code Flow**
   - **PKCE (Proof Key for Code Exchange)**
 - O fluxo é realizado de forma segura entre frontend, Identity Provider (IdP) e backend.
@@ -204,6 +266,66 @@ O backend renova tokens automaticamente sem interação do usuário.
 
 ---
 
+### 🔐 Sistema de Permissionamento (PBAC)
+
+O sistema utiliza controle de acesso baseado em permissões granulares (PBAC), ao invés de RBAC tradicional baseado em roles. Cada usuário possui permissões atribuídas diretamente, retornadas pelo backend através do endpoint:
+
+```http
+GET /auth/session
+```
+
+### Exemplo
+
+```json
+{
+  "user": {
+    "id": "uuid",
+    "email": "user@email.com",
+    "permissions": {
+      "dashboard": {
+        "view": true,
+        "export": {
+          "pdf": true,
+          "excel": true
+        }
+      }
+    }
+  }
+}
+```
+
+---
+
+### 🔑 Controle de Permissões no Frontend
+
+### Hook de permissão
+
+```ts
+const canExportPdf = usePermission("dashboard:export:pdf");
+```
+
+---
+
+### Exibição condicional
+
+```tsx
+{
+  canExportPdf && <ExportButton />;
+}
+```
+
+---
+
+### Permissionamento de rotas
+
+```tsx
+<PermissionGuard permission="dashboard:view">
+  <DashboardPage />
+</PermissionGuard>
+```
+
+---
+
 ### 🔒 Proteção de rotas
 
 ### AuthGuard (rotas privadas)
@@ -214,7 +336,7 @@ O backend renova tokens automaticamente sem interação do usuário.
 </AuthGuard>
 ```
 
-#### GuestGuard (rotas públicas)
+### GuestGuard (rotas públicas)
 
 ```bash
 <GuestGuard>
@@ -301,7 +423,7 @@ O projeto utiliza um **Root Config** com `single-spa` responsável pela iniciali
 
 Antes da renderização dos MFEs, o Root Config executa um processo de bootstrap de autenticação responsável por:
 
-- inicializar a sessão do usuário
+- inicializar a sessão do usuário e permissionamento
 - validar estado autenticado/não autenticado
 - obter token CSRF
 - configurar interceptors HTTP globais
@@ -318,7 +440,7 @@ Após a conclusão do bootstrap:
 
 - os MFEs são renderizados
 - o estado autenticado já está sincronizado
-- interceptors e sessão já estão configurados globalmente
+- interceptors, sessão e permissionamento já estão configurados globalmente
 
 Essa abordagem evita:
 
@@ -340,7 +462,7 @@ Essa abordagem evita:
 
 ```bash
 git clone <repo-url>
-cd auth-sso-mfe-single-spa-react
+cd auth-hybrid-permissions-mfe-single-spa-react
 npm install
 ```
 
@@ -363,6 +485,7 @@ shared-ui     → 9002
 mfe-auth      → 9003
 mfe-layout    → 9004
 mfe-dashboard → 9005
+mfe-forbidden → 9006
 ```
 
 ---

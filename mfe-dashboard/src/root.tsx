@@ -1,5 +1,5 @@
 import { BrowserRouter } from 'react-router-dom';
-import { AuthGuard, AuthProviders } from '@app/shared-auth';
+import { AuthGuard, AuthProviders, PermissionGuard } from '@app/shared-auth';
 import { UIProviders } from '@app/shared-ui';
 import { DashboardPage } from './pages';
 
@@ -9,7 +9,9 @@ export function Root() {
       <AuthGuard>
         <UIProviders>
           <BrowserRouter>
-            <DashboardPage />
+            <PermissionGuard permission="dashboard:view">
+              <DashboardPage />
+            </PermissionGuard>
           </BrowserRouter>
         </UIProviders>
       </AuthGuard>

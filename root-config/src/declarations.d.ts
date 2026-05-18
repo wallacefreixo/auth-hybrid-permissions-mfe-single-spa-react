@@ -42,3 +42,4 @@ declare module '@app/mfe-layout';
 declare module '@app/mfe-dashboard';
 declare module '@app/mfe-auth';
 declare module '@app/shared-auth';
+declare module '@app/mfe-forbidden';

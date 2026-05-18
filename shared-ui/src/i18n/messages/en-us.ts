@@ -18,6 +18,7 @@ export const enUS = {
   dashboard: {
     description: 'You have successfully accessed a protected route.',
     logout: 'Log out',
+    export: 'Export to',
   },
   theme: {
     toggle: 'Toggle theme',
@@ -26,5 +27,9 @@ export const enUS = {
     ariaLabel: 'Change language',
     portuguese: 'Portuguese',
     english: 'English',
+  },
+  forbidden: {
+    title: 'Access denied',
+    description: 'You do not have permission to access this resource.',
   },
 } as const;
